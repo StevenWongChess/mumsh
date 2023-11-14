@@ -1,0 +1,1 @@
+#define LINE_MAX_LEN 1024
