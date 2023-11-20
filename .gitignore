@@ -1,0 +1,9 @@
+# MacOS files
+.DS_Store
+
+# vscode files
+.vscode/
+
+# executable files
+mumsh
+mumsh_memory_check
