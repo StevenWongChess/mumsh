@@ -1,5 +1,6 @@
 #include "token.h"
 
+// push a string to the back of tokens
 void token_push_back(Tokens* tokens, char token[ARG_MAX_LEN], int *it){
 	if(tokens->size == tokens->capacity){
 		// resize if full capacity
@@ -10,14 +11,15 @@ void token_push_back(Tokens* tokens, char token[ARG_MAX_LEN], int *it){
 	strcpy(tokens->vector[tokens->size], token);
 	++(tokens->size);
 
-	// cleanup the token and its "iterator"
+	// cleanup the token and reset its "iterator"
 	token[0] = '\0';
 	*it = 0;
 }
 
+// read from stdin and return tokens splited by space
 Tokens* readline(){
-	char buffer[LINE_MAX_LEN];
 	Tokens* tokens = NULL;
+	char buffer[LINE_MAX_LEN];
 	char token[ARG_MAX_LEN] = "\0";
 	int it = 0; // token_tail_index
 	bool prev_blank = true;
@@ -58,7 +60,7 @@ Tokens* readline(){
 		}
 
 	}
-	
+	tokens->vector[tokens->size] = NULL;
 	return tokens;
 }
 
