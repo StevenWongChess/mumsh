@@ -43,6 +43,41 @@ Tokens* readline(){
 			else if(buffer[i] == '\n'){
 				break;
 			}
+			else if(buffer[i] == '<'){
+				// deal with "word<" to put word in tokens first, 
+				// otherwise no " " to trigger token_push_back
+				if(!prev_blank){
+					prev_blank = true;
+					token_push_back(tokens, token, &it);
+				}
+
+				// < case
+				token[0] = '<';
+				token[1] = '\0';
+				it = 1;
+				token_push_back(tokens, token, &it);
+			}
+			else if(buffer[i] == '>'){
+				if(!prev_blank){
+					prev_blank = true;
+					token_push_back(tokens, token, &it);
+				}
+
+				if(i + 1 < buffer_size - 1 && buffer[i + 1] == '>'){
+					// >> case
+					token[0] = token[1] = '>';
+					token[2] = '\0';
+					it = 2;
+					token_push_back(tokens, token, &it);
+				}
+				else{
+					// > case
+					token[0] = '>';
+					token[1] = '\0';
+					it = 1;
+					token_push_back(tokens, token, &it);
+				}
+			}
 			else{
 				// append char to token
 				prev_blank = false;
