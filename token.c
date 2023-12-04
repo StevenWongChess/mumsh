@@ -60,11 +60,12 @@ Tokens* readline(){
 		}
 
 	}
-	tokens->vector[tokens->size] = NULL;
 	return tokens;
 }
 
 void clean_token(Tokens* tokens){
+	if(!tokens)
+		return;
 	for(int i = 0; i < tokens->size; i++){
 		free(tokens->vector[i]);
 	}

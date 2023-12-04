@@ -12,9 +12,12 @@ int main(){
 	do{
 		prompt();
 
-		Tokens* tokens = readline();
+		Tokens* tokens = NULL;
 		Command_List* table = NULL;
+
+		tokens = readline();
 		// print_tokens(tokens);
+
 		if(tokens->size > 0 && strcmp(tokens->vector[0], "exit") == 0){
 			clean_token(tokens);
 			printf("exit\n");
@@ -25,7 +28,6 @@ int main(){
 		execute(table);
 		clean_token(tokens);
 		clean_command_list(table);
-		tokens = NULL;
 	} while (true);
 
 	exit(EXIT_SUCCESS);
