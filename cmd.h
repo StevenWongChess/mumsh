@@ -17,5 +17,6 @@ typedef struct _Command_List{
 
 Command_List* parse(Tokens* tokens);
 void execute(Command_List* table);
-
+void print_command(Command* command);
+void print_command_list(Command_List* table);
 void clean_command_list(Command_List* table);

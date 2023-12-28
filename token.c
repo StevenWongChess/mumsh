@@ -37,7 +37,6 @@ Tokens* readline(){
 					// add token to tokens
 					token_push_back(tokens, token, &it);
 					prev_blank = true;
-					it = 0;
 				}
 			}
 			else if(buffer[i] == '\n'){
@@ -69,6 +68,7 @@ Tokens* readline(){
 					token[2] = '\0';
 					it = 2;
 					token_push_back(tokens, token, &it);
+					++i;
 				}
 				else{
 					// > case
@@ -77,6 +77,18 @@ Tokens* readline(){
 					it = 1;
 					token_push_back(tokens, token, &it);
 				}
+			}
+			else if(buffer[i] == '|'){
+				if(!prev_blank){
+					prev_blank = true;
+					token_push_back(tokens, token, &it);
+				}
+
+				// | case
+				token[0] = '|';
+				token[1] = '\0';
+				it = 1;
+				token_push_back(tokens, token, &it);
 			}
 			else{
 				// append char to token

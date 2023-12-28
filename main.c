@@ -25,6 +25,7 @@ int main(){
 		}
 
 		table = parse(tokens);
+		// print_command_list(table);
 		execute(table);
 		clean_token(tokens);
 		clean_command_list(table);
