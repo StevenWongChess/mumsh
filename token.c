@@ -105,8 +105,19 @@ Tokens* readline(){
 			// prev_blank = true;
 			// it = 0;
 		}
-
 	}
+
+	/***
+	 * unfinished command + ctrl d => nothing
+	 * empty command + ctrl d => exit
+	 * unfinished command + 2 X ctrl d will still exit, while on linux it will no nothing
+	***/
+	if(feof(stdin)){
+		clean_token(tokens);
+		printf("\nexit\n");
+		exit(EXIT_SUCCESS);
+	}
+
 	return tokens;
 }
 
