@@ -1,5 +1,7 @@
 #include "cmd.h"
 
+char OLDPWD[DIR_MAX_LEN] = "\0";
+
 Command_List* parse(Tokens* tokens) {
     Command_List* table = NULL;
     table = malloc(sizeof(Command_List));
@@ -85,10 +87,46 @@ void execute(Command_List* table){
         dup2(outfd, STDOUT_FILENO);
         close(outfd);
 
-        pid = fork();
-        if(pid == 0){
-            execvp(table->list[i].vector[0], table->list[i].vector);
+        Command* cmd = &(table->list[i]);
+        if(strcmp(cmd->vector[0], "pwd") == 0){
+            // built-in command pwd
+            char wd[DIR_MAX_LEN];
+            getcwd(wd, DIR_MAX_LEN);
+            printf("%s\n", wd);
         }
+        else if(strcmp(cmd->vector[0], "cd") == 0){
+            // built-in command cd
+            char current_wd[DIR_MAX_LEN];
+            getcwd(current_wd, DIR_MAX_LEN);
+
+            if(cmd->size == 1 || strcmp(cmd->vector[1], "~") == 0){
+                chdir(getenv("HOME"));
+                strcpy(OLDPWD, current_wd);
+            }
+            else if(strcmp(cmd->vector[1], "-") == 0){
+                if(strlen(OLDPWD) == 0){
+                    printf("bash: cd: OLDPWD not set\n");
+                }
+                else{
+                    chdir(OLDPWD);
+                    strcpy(OLDPWD, current_wd);
+                }
+            }
+            else{
+                if(chdir(cmd->vector[1]) == -1){
+                    ;
+                }
+                else{
+                    strcpy(OLDPWD, current_wd);
+                }
+            }
+        }
+        else{
+            pid = fork();
+            if(pid == 0){
+                execvp(cmd->vector[0], cmd->vector);
+            }
+        }  
     }
 
     dup2(backup_in, STDIN_FILENO);

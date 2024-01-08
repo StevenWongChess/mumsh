@@ -1,3 +1,6 @@
+#ifndef CMD_H
+#define CMD_H
+
 #include "constant.h"
 #include "token.h"
 #include <fcntl.h>
@@ -20,3 +23,5 @@ void execute(Command_List* table);
 void print_command(Command* command);
 void print_command_list(Command_List* table);
 void clean_command_list(Command_List* table);
+
+#endif

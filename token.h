@@ -1,5 +1,5 @@
-#ifndef CLASS_H
-#define CLASS_H
+#ifndef TOKEN_H
+#define TOKEN_H
 
 #include "constant.h"
 #include <stdbool.h>
