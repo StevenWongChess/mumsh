@@ -24,86 +24,133 @@ Tokens* readline(){
 	int it = 0; // token_tail_index
 	bool prev_blank = true;
 
-	if(fgets(buffer, LINE_MAX_LEN, stdin)){
-		tokens = malloc(sizeof(Tokens));
-		tokens->size = 0;
-		tokens->capacity = TOKENS_INITIAL_CAPACITY;
-		tokens->vector = malloc(tokens->capacity * sizeof(char*));
+	int quote = 0; //01 means in 'xxx', 10 means in "xxx"
+	bool complete = false;
+
+	while(!complete && fgets(buffer, LINE_MAX_LEN, stdin)){
+		if(!tokens){
+			tokens = malloc(sizeof(Tokens));
+			tokens->size = 0;
+			tokens->capacity = TOKENS_INITIAL_CAPACITY;
+			tokens->vector = malloc(tokens->capacity * sizeof(char*));
+		}
 
 		int buffer_size = strlen(buffer);
 		for(int i = 0; i < buffer_size; ++i){
-			if(buffer[i] == ' '){
-				if(!prev_blank){
-					// add token to tokens
-					token_push_back(tokens, token, &it);
-					prev_blank = true;
-				}
-			}
-			else if(buffer[i] == '\n'){
-				break;
-			}
-			else if(buffer[i] == '<'){
-				// deal with "word<" to put word in tokens first, 
-				// otherwise no " " to trigger token_push_back
-				if(!prev_blank){
-					prev_blank = true;
-					token_push_back(tokens, token, &it);
-				}
-
-				// < case
-				token[0] = '<';
-				token[1] = '\0';
-				it = 1;
-				token_push_back(tokens, token, &it);
-			}
-			else if(buffer[i] == '>'){
-				if(!prev_blank){
-					prev_blank = true;
-					token_push_back(tokens, token, &it);
-				}
-
-				if(i + 1 < buffer_size - 1 && buffer[i + 1] == '>'){
-					// >> case
-					token[0] = token[1] = '>';
-					token[2] = '\0';
-					it = 2;
-					token_push_back(tokens, token, &it);
-					++i;
+			if(quote == 01){
+				if(buffer[i] == '\''){
+					quote = 0;
+					complete = true;
 				}
 				else{
-					// > case
-					token[0] = '>';
+					prev_blank = false;
+					token[it] = buffer[i];
+					++it;
+					token[it] = '\0';
+				}
+			}
+			else if(quote == 10){
+				if(buffer[i] == '\"'){
+					quote = 0;
+					complete = true;
+				}
+				else{
+					prev_blank = false;
+					token[it] = buffer[i];
+					++it;
+					token[it] = '\0';
+				}
+			}
+			else{
+				if(buffer[i] == ' '){
+					if(!prev_blank){
+						// add token to tokens
+						token_push_back(tokens, token, &it);
+						prev_blank = true;
+					}
+				}
+				else if(buffer[i] == '\n'){
+					break;
+				}
+				else if(buffer[i] == '<'){
+					// deal with "word<" to put word in tokens first, 
+					// otherwise no " " to trigger token_push_back
+					complete = false;
+					if(!prev_blank){
+						prev_blank = true;
+						token_push_back(tokens, token, &it);
+					}
+
+					// < case
+					token[0] = '<';
 					token[1] = '\0';
 					it = 1;
 					token_push_back(tokens, token, &it);
 				}
-			}
-			else if(buffer[i] == '|'){
-				if(!prev_blank){
-					prev_blank = true;
+				else if(buffer[i] == '>'){
+					complete = false;
+					if(!prev_blank){
+						prev_blank = true;
+						token_push_back(tokens, token, &it);
+					}
+
+					if(i + 1 < buffer_size - 1 && buffer[i + 1] == '>'){
+						// >> case
+						token[0] = token[1] = '>';
+						token[2] = '\0';
+						it = 2;
+						token_push_back(tokens, token, &it);
+						++i;
+					}
+					else{
+						// > case
+						token[0] = '>';
+						token[1] = '\0';
+						it = 1;
+						token_push_back(tokens, token, &it);
+					}
+				}
+				else if(buffer[i] == '|'){
+					complete = false;
+					if(!prev_blank){
+						prev_blank = true;
+						token_push_back(tokens, token, &it);
+					}
+
+					// | case
+					token[0] = '|';
+					token[1] = '\0';
+					it = 1;
 					token_push_back(tokens, token, &it);
 				}
-
-				// | case
-				token[0] = '|';
-				token[1] = '\0';
-				it = 1;
-				token_push_back(tokens, token, &it);
-			}
-			else{
+				else if(buffer[i] == '\''){
+					complete = false;
+					quote = 01;
+				}
+				else if(buffer[i] == '\"'){
+					complete = false;
+					quote = 10;
+				}
+				else{
 				// append char to token
 				prev_blank = false;
 				token[it] = buffer[i];
 				++it;
 				token[it] = '\0';
+				complete = true;
+			}
 			}
 		}
 
-		if(!prev_blank){
+		if(complete && !prev_blank){
 			// add token to tokens
 			token_push_back(tokens, token, &it);
 			// prev_blank = true;
 			// it = 0;
+		}
+
+		if(!complete){
+			printf("> ");
 		}
 	}
 
@@ -134,6 +181,8 @@ void clean_token(Tokens* tokens){
 void print_tokens(Tokens* tokens){
     printf("----printing %d tokens----\n", tokens->size);
     for(int i=0; i < tokens->size; i++){
+		printf("---printing %dth tokens---\n", i);
         printf("%s\n", tokens->vector[i]);
     }
+	printf("--------------------------\n");
 }
