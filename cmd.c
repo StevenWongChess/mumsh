@@ -63,6 +63,12 @@ void execute(Command_List* table){
     }
 
     for(int i = 0; i < table->size; i++){
+        struct sigaction sa;
+        sigemptyset(&sa.sa_mask);
+        sa.sa_flags = SA_RESTART;
+        sa.sa_handler = sigint_handler;
+        sigaction(SIGINT, &sa, NULL);
+
         dup2(infd, STDIN_FILENO);
         close(infd);
         if(i == table->size - 1){

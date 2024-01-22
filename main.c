@@ -1,15 +1,30 @@
-#include <unistd.h>
-
-#include "constant.h"
-#include "token.h"
-#include "cmd.h"
+#include "main.h"
 
 void prompt(){
 	printf("mum $ ");
 }
 
+void sigint_handler(){
+	if(isexecuting == 1)
+		return;
+	else
+		siglongjmp(env, 42);
+}
+
 int main(){
+	// initialize
+	struct sigaction sa;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART;
+	sa.sa_handler = sigint_handler;
+	sigaction(SIGINT, &sa, NULL);
+
 	do{
+		if(sigsetjmp(env, 1) == 42){
+			printf("\n");
+			continue;
+		}
+
 		prompt();
 
 		Tokens* tokens = NULL;
@@ -26,7 +41,9 @@ int main(){
 
 		table = parse(tokens);
 		// print_command_list(table);
+		isexecuting = 1;
 		execute(table);
+		isexecuting = 0;
 		clean_token(tokens);
 		clean_command_list(table);
 	} while (true);

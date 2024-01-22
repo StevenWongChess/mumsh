@@ -4,6 +4,7 @@
 #include "constant.h"
 #include "token.h"
 #include <fcntl.h>
+#include "main.h"
 
 typedef struct _Command{
 	int size;
