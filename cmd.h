@@ -5,6 +5,7 @@
 #include "token.h"
 #include <fcntl.h>
 #include "main.h"
+#include <errno.h>
 
 typedef struct _Command{
 	int size;

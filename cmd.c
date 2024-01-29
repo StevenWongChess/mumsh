@@ -57,6 +57,10 @@ void execute(Command_List* table){
     // deal with redirections
     if(strlen(table->infd) > 0){
         infd = open(table->infd, O_RDONLY, 0666);
+        if(infd == -1){
+            printf("%s: No such file or directory\n", table->infd);
+            return;
+        }
     }
     else{
         infd = dup(backup_in);
@@ -75,6 +79,10 @@ void execute(Command_List* table){
             // last pipe command, deal with output
             if(strlen(table->outfd) > 0){
                 outfd = open(table->outfd, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+                // if(infd == -1){
+                //     printf("%s: Permission denied\n", table->infd);
+                //     return;
+                // }
             }
             else if(strlen(table->appfd) > 0){
                 outfd = open(table->appfd, O_WRONLY | O_CREAT | O_APPEND, 0666);
@@ -130,7 +138,12 @@ void execute(Command_List* table){
         else{
             pid = fork();
             if(pid == 0){
-                execvp(cmd->vector[0], cmd->vector);
+                if(execvp(cmd->vector[0], cmd->vector) == -1){
+                    if(errno == 2)
+                        printf("%s: command not found\n", cmd->vector[0]);
+                    // printf("%d: %s\n", errno, strerror(errno));
+                    exit(EXIT_FAILURE);
+                }
             }
         }  
     }
